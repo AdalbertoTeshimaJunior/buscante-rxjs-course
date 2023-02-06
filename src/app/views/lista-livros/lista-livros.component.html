@@ -1,0 +1,26 @@
+<section class="container">
+  <header>Que book você procura?</header>
+  <div class="busca">
+    <input
+      type="search"
+      [(ngModel)]="searchField"
+    >
+    <button (click)="fetchBooks()">
+      <img src="assets/imagens/icone-busca.png" alt="Lupa de cor roxa">
+    </button>
+  </div>
+  <p>Busque por assunto, autoria, nome...</p>
+<div class="container-card" *ngIf="listBooks?.length > 0, else homeScreen">
+  <div *ngFor="let book of listBooks">
+    <app-livro [livro]="book"></app-livro>
+  </div>
+</div>
+<ng-template #homeScreen>
+  <div class="imagens">
+    <h1 class="titulo">Busque o book <br> que quiser na <br> nossa estante!</h1>
+    <img
+      class="ilustracao"
+      src="../../assets/imagens/ilustracao-estante.png"
+      alt="Ilustração de uma pessoa em pé ao lado de uma estante com books e plantas">
+  </div>
+</ng-template>
