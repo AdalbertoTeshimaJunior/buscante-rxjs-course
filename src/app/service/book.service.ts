@@ -1,7 +1,7 @@
-import { LivrosResultado } from './../models/interfaces';
+import { LivrosResultado, Item } from './../models/interfaces';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap, map } from 'rxjs';
 
 
 @Injectable({
@@ -12,8 +12,11 @@ export class BookService {
   private readonly API = 'https://www.googleapis.com/books/v1/volumes'
   constructor(private http: HttpClient) { }
 
-  fetch(valueTyped: string): Observable<LivrosResultado> {
+  fetch(valueTyped: string): Observable<Item[]> {
       const params = new HttpParams().append('q', valueTyped)
-      return this.http.get(this.API, { params })
+      return this.http.get<LivrosResultado>(this.API, { params }).pipe(
+        tap(APIReturn => console.log(APIReturn)),
+        map(result => result.items),
+      );
   }
 }
