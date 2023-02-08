@@ -1,4 +1,5 @@
-import { Livro } from './../../models/interfaces';
+import { LivroVolumeInfo } from './../../models/livroVolumeInfo';
+import { Livro, Item } from './../../models/interfaces';
 import { BookService } from './../../service/book.service';
 import { Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -26,22 +27,10 @@ export class ListaLivrosComponent implements OnDestroy {
     });
   }
 
-  livrosResultadoParaLivros(items): Livro[] {
-    const books: Livro[] = [];
-
-    items.forEach(item => {
-      books.push(this.book = {
-        title: item.volumeInfo?.title,
-        authors: item.volumeInfo?.authors,
-        publisher: item.volumeInfo?.publisher,
-        publishedDate: item.volumeInfo?.publishedDate,
-        description: item.volumeInfo?.description,
-        previewLink: item.volumeInfo?.previewLink,
-        thumbnail: item.volumeInfo?.imageLinks?.thumbnail,
-      });
-    });
-
-    return books;
+  livrosResultadoParaLivros(items: Item[]): LivroVolumeInfo[] {
+    return items.map(item => {
+      return new LivroVolumeInfo(item);
+    })
   }
 
   ngOnDestroy() {
