@@ -1,40 +1,38 @@
 import { LivroVolumeInfo } from './../../models/livroVolumeInfo';
-import { Livro, Item } from './../../models/interfaces';
+import { Item } from './../../models/interfaces';
 import { BookService } from './../../service/book.service';
-import { Component, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component } from '@angular/core';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, throwError } from 'rxjs';
+import { FormControl } from '@angular/forms';
 
+const pause = 300;
 @Component({
   selector: 'app-lista-livros',
   templateUrl: './lista-livros.component.html',
   styleUrls: ['./lista-livros.component.css']
 })
-export class ListaLivrosComponent implements OnDestroy {
+export class ListaLivrosComponent {
 
-  listBooks: Livro[];
-  searchField: string = '';
-  subscription: Subscription;
-  book: Livro;
+  searchField = new FormControl();
 
   constructor(private service: BookService) { }
 
-  fetchBooks() {
-    this.subscription = this.service.fetch(this.searchField).subscribe({
-      next: items => {
-        this.listBooks = this.livrosResultadoParaLivros(items);
-      },
-      error: error => console.error(error),
-    });
-  }
+  booksFound$ = this.searchField.valueChanges
+  .pipe(
+    debounceTime(pause),
+    filter((enteredValue) => enteredValue.length >= 3),
+    distinctUntilChanged(),
+    switchMap((enteredValue) => this.service.fetch(enteredValue)),
+    map(items => this.livrosResultadoParaLivros(items)),
+    catchError(erro => {
+      return throwError(() => new Error('Erro!!!'))
+    })
+  )
 
   livrosResultadoParaLivros(items: Item[]): LivroVolumeInfo[] {
     return items.map(item => {
       return new LivroVolumeInfo(item);
     })
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
   }
 }
 
